@@ -1,0 +1,58 @@
+<div class="dnsdball">
+    {{#each block.data.details.bodyObjects as |item|}}
+
+    <div class = "rtype">
+        {{#if item.rrtype}}
+        <i class = "fa fa-list #ADADAD"></i><span class="type"> <b>Type: </b> </span>
+        {{item.rrtype}}
+        {{/if}}
+    </div>
+
+    <div class = "count">
+        {{#if item.count}}
+            <span class="counts"> Count: </span>
+            <b>{{item.count}}</b>
+        {{/if}}
+    </div>
+
+    <div class = "bali">
+        {{#if item.bailiwick}}
+            <span class="balis"> Bailiwick: </span>
+            <b>{{item.bailiwick}}</b>
+        {{/if}}
+    </div>
+
+    <div class = "first">
+        {{#if item.time_first}}
+            <span class="Ctimefirst"> First Seen: </span>
+            <b>{{moment-time item.time_first}}</b>
+        {{/if}}
+    </div>
+
+    <div class = "last">
+        {{#if item.time_last}}
+            <span class="Ctimelast"> Last Seen: </span>
+            <b>{{moment-time item.time_last}}</b>
+        {{/if}}
+    </div>
+
+    <div class = "rname">
+        {{#if item.rrname}}
+            <span class="name"> Name: </span>
+            <b>{{item.rrname}}</b>
+        {{/if}}
+    </div>
+
+    <div class = "rrdata">
+        {{#if item.rdata}}
+        <span class="datas"> Data: </span>
+        {{/if}}
+            {{#if item.rdata}}
+                {{#each item.rdata as |data|}}
+                        <li>{{data}}</li>
+                {{/each}}
+            {{else}}
+            {{/if}}
+    </div>
+    {{/each}}
+    </div>
