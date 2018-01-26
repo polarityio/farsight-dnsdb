@@ -21,6 +21,7 @@ module.exports = {
             "name"        : "API Key",
             "description" : "DNSDB API key",
             "type"        : "text",
+            "default"     : "",
             "userCanEdit" : false,
             "adminOnly"    : false
         },
