@@ -6,14 +6,38 @@ let util = require('util');
 let net = require('net');
 let async = require('async');
 var log = null;
+let requestWithDefaults;
 
 const BASE_URI = 'https://api.dnsdb.info/lookup/rrset/name/';
 const IP_URI = 'https://api.dnsdb.info/lookup/rdata/ip/';
 //const THROTTLE_INTERVAL = 3000;
 //const THROTTLE_MAX_REQUESTS = 1;
 
-function startup(logger){
+function startup(logger) {
     log = logger;
+    let defaults = {};
+
+    if (typeof config.request.cert === 'string' && config.request.cert.length > 0) {
+        defaults.cert = fs.readFileSync(config.request.cert);
+    }
+
+    if (typeof config.request.key === 'string' && config.request.key.length > 0) {
+        defaults.key = fs.readFileSync(config.request.key);
+    }
+
+    if (typeof config.request.passphrase === 'string' && config.request.passphrase.length > 0) {
+        defaults.passphrase = config.request.passphrase;
+    }
+
+    if (typeof config.request.ca === 'string' && config.request.ca.length > 0) {
+        defaults.ca = fs.readFileSync(config.request.ca);
+    }
+
+    if (typeof config.request.proxy === 'string' && config.request.proxy.length > 0) {
+        defaults.proxy = config.request.proxy;
+    }
+
+    requestWithDefaults = request.defaults(defaults);
 }
 
 function doLookup(entities, options, cb) {
@@ -67,8 +91,12 @@ function _lookupEntity(entityObj, options, cb) {
 
     if(entityObj.value)
         request({
-            uri: BASE_URI + entityObj.value.toLowerCase(),
-            method: 'GET',
+        uri: DOMAIN_URI + entityObj.value.toLowerCase(),
+        method: 'GET',
+        qs: {
+            limit: 10,
+            time_last_after: -31536000
+        },
             headers: {
                 'X-API-Key': options.apiKey,
                 'Accept': 'application/json'
@@ -80,46 +108,9 @@ function _lookupEntity(entityObj, options, cb) {
                 return;
             }
 
-            if(response.statusCode === 429){
-                cb(_createJsonErrorPayload("Daily DNSDB API Lookup Limit Reached", null, '429', '2A', 'Lookup Limit Reached', {
-                    err: err
-                }));
-                return;
-            }
-
-            if(response.statusCode === 503){
-                cb(_createJsonErrorPayload("Limit of number of concurrent connections is exceeded for DNSDB", null, '503', '2A', 'Concurrent Connections Exceeded', {
-                    err: err
-                }));
-                return;
-            }
-
-            if(response.statusCode === 400){
-                cb(_createJsonErrorPayload("URL formatted incorrectly", null, '400', '2A', 'Bad Request', {
-                    err: err
-                }));
-                return;
-            }
-
-            if(response.statusCode === 500){
-                cb(_createJsonErrorPayload("Error processing your request", null, '500', '2A', 'Internal Server Error', {
-                    err: err,
-                    entity: entityObj.value
-                }));
-                return;
-            }
-
-            if(response.statusCode === 403){
-                cb(_createJsonErrorPayload("You do not have permission to access DNSDB. Please check your API key", null, '403', '2A', 'Permission Denied', {
-                    err: err
-                }));
-                return;
-            }
-
-            if(response.statusCode === 404){
-                cb(_createJsonErrorPayload("Entity not found in DNSDB", null, '404', '2A', 'Entity not found', {
-                    err: err,
-                    entity: entityObj.value
+    requestWithDefaults(requestOptions, function (err, response, body) {
+        let errorObject = _isApiError(err, response, body, entityObj.value);
+        if (errorObject) {
                 }));
                 return;
             }
@@ -183,7 +174,7 @@ function _lookupEntityIP(entityObj, options, cb) {
                 'Accept': 'application/json'
             },
             json: true
-        }, function (err, response, body) {
+    requestWithDefaults(requestOptions, function (err, response, body) {
             if (err) {
                 cb(err);
                 return;
