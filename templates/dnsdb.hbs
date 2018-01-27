@@ -48,11 +48,13 @@
         <span class="datas"> Data: </span>
         {{/if}}
             {{#if item.rdata}}
+                <ul>
                 {{#each item.rdata as |data|}}
                         <li>{{data}}</li>
                 {{/each}}
+                </ul>
             {{else}}
             {{/if}}
     </div>
     {{/each}}
-    </div>
+</div>
