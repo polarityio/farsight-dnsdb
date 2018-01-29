@@ -41,11 +41,10 @@ function startup(logger) {
 }
 
 function doLookup(entities, options, cb) {
+    let blacklist = options.blacklist;
 
-    var blacklist = options.blacklist;
     log.trace({blacklist: blacklist}, "checking to see what blacklist looks like");
 
-    let entitiesWithNoData = [];
     let lookupResults = [];
 
     if (typeof(options.apiKey) !== 'string' || options.apiKey.length === 0) {
@@ -55,9 +54,8 @@ function doLookup(entities, options, cb) {
 
     async.each(entities, function (entityObj, next) {
         if (_.includes(blacklist, entityObj.value)) {
-            rnext(null);
-        }
-        else if (entityObj.isDomain && options.lookupDomain) {
+            next(null);
+        }else if (entityObj.isDomain && options.lookupDomain) {
             _lookupEntityDomain(entityObj, options, function (err, result) {
                 if (err) {
                     next(err);
@@ -67,7 +65,7 @@ function doLookup(entities, options, cb) {
                     next(null);
                 }
             });
-        } else if (options.lookupIp && entityObj.isIPv4 || entityObj.isIPv6) {
+        } else if (options.lookupIp && (entityObj.isIPv4 || entityObj.isIPv6) && !entityObj.isPrivateIP) {
             _lookupEntityIP(entityObj, options, function (err, result) {
                 if (err) {
                     next(err);
@@ -91,8 +89,8 @@ function _lookupEntityDomain(entityObj, options, cb) {
         uri: DOMAIN_URI + entityObj.value.toLowerCase(),
         method: 'GET',
         qs: {
-            limit: 10,
-            time_last_after: -31536000
+            limit: options.limit,
+            time_last_after: options.timeLastAfter
         },
         headers: {
             'X-API-Key': options.apiKey,
@@ -100,6 +98,10 @@ function _lookupEntityDomain(entityObj, options, cb) {
         },
         json: true
     };
+
+    if(options.timeLastAfter === 0){
+        delete requestOptions.qs.time_last_after;
+    }
 
     requestWithDefaults(requestOptions, function (err, response, body) {
         let errorObject = _isApiError(err, response, body, entityObj.value);
@@ -138,11 +140,12 @@ function _lookupEntityDomain(entityObj, options, cb) {
             entity: entityObj,
             // Required: An object containing everything you want passed to the template
             data: {
-                // Required: These are the tags that are displayed in your template
-                summary: [bodyObjects[1].rrname],
+                // We are constructing the tags using a custom summary block so no data needs to be passed here
+                summary: [],
                 // Data that you want to pass back to the notification window details block
                 details: {
-                    bodyObjects: bodyObjects
+                    maxTags: options.maxTags,
+                    results: bodyObjects
                 }
             }
         });
@@ -154,7 +157,8 @@ function _lookupEntityIP(entityObj, options, cb) {
         uri: IP_URI + entityObj.value,
         method: 'GET',
         qs: {
-            limit: 10
+            limit: options.limit,
+            time_last_after: options.timeLastAfter
         },
         headers: {
             'X-API-Key': options.apiKey,
@@ -162,6 +166,10 @@ function _lookupEntityIP(entityObj, options, cb) {
         },
         json: true
     };
+
+    if(options.timeLastAfter === 0){
+        delete requestOptions.qs.time_last_after;
+    }
 
     requestWithDefaults(requestOptions, function (err, response, body) {
         let errorObject = _isApiError(err, response, body, entityObj.value);
@@ -203,12 +211,14 @@ function _lookupEntityIP(entityObj, options, cb) {
             entity: entityObj,
             // Required: An object containing everything you want passed to the template
             data: {
-                // Required: These are the tags that are displayed in your template
-                summary: [bodyObjects[1].rrname],
+                // We are constructing the tags using a custom summary block so no data needs to be passed here
+                summary: [],
                 // Data that you want to pass back to the notification window details block
                 details: {
-                    bodyObjects: bodyObjects
-                }
+                    maxTags: options.maxTags,
+                    results: bodyObjects
+                },
+
             }
         });
     });
@@ -222,6 +232,13 @@ function _lookupEntityIP(entityObj, options, cb) {
  * @private
  */
 function _processRequestBody(body){
+    if(typeof body === 'object' && !Array.isArray(body)){
+        // if only a single item is returned then it is automatically converted into
+        // a javascript object literal by the request library so we can just return it inside
+        // an array to keep everything consistent.
+        return [body];
+    }
+
     if(typeof body !== 'string' || body.length === 0){
         return [];
     }

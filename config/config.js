@@ -4,17 +4,25 @@ module.exports = {
     logging: {
         level: "debug"
     },
-    description: "Farsight DNSDB Passive DNS api integration",
+    description: "Farsight DNSDB Passive DNS API integration",
     entityTypes: ['domain', 'IPv4', 'IPv6'],
     styles: [
         "./styles/dnsdb.less"
     ],
     block: {
         component: {
-            file: "./components/dnsdb.js"
+            file: "./components/dnsdb-block.js"
         },
         template: {
-            file: "./templates/dnsdb.hbs"
+            file: "./templates/dnsdb-block.hbs"
+        }
+    },
+    summary: {
+        component: {
+            file: "./components/dnsdb-summary.js"
+        },
+        template: {
+            file: "./templates/dnsdb-summary.hbs"
         }
     },
     request: {
@@ -46,11 +54,38 @@ module.exports = {
         },
         {
             key: "blacklist",
-            name: "Blacklist Domains",
-            description: "List of domains that you never want to send to DNSDB",
+            name: "IP or Domain Blacklist",
+            description: "List of domains or IPs (space delimited) that you never want to send to DNSDB",
             default: "",
             type: "text",
             userCanEdit: false,
+            adminOnly: false
+        },
+        {
+            key: "timeLastAfter",
+            name: "Time Last After",
+            description: "Filters out results where the last seen time is after the given time.  The parameters expects an integer (Unix/Epoch time) with seconds granularity or a relative time in seconds (preceded by -). The default is to return results within the last year.",
+            default: -31536000,
+            type: "number",
+            userCanEdit: false,
+            adminOnly: true
+        },
+        {
+            key: "limit",
+            name: "Lookup Limit",
+            description: "The maximum number of results to return per IP or Domain lookup.",
+            default: 10,
+            type: "number",
+            userCanEdit: false,
+            adminOnly: true
+        },
+        {
+            key: "maxTags",
+            name: "Maximum Number of Tags to Display",
+            description: "Set the maximum number of unique summary tags to display in the notification overlay.",
+            default: 3,
+            type: "number",
+            userCanEdit: true,
             adminOnly: false
         },
         {
