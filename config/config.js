@@ -2,7 +2,7 @@ module.exports = {
     name: "Farsight DNSDB",
     acronym: "PDNS",
     logging: {
-        level: "debug"
+        level: "info"
     },
     description: "Farsight DNSDB Passive DNS API integration",
     entityTypes: ['domain', 'IPv4', 'IPv6'],
