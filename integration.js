@@ -9,6 +9,10 @@ let async = require('async');
 let fs = require('fs');
 let log = null;
 let requestWithDefaults;
+let previousDomainRegexAsString = '';
+let previousIpRegexAsString = '';
+let domainBlacklistRegex = null;
+let ipBlacklistRegex = null;
 
 const DOMAIN_URI = 'https://api.dnsdb.info/lookup/rrset/name/';
 const IP_URI = 'https://api.dnsdb.info/lookup/rdata/ip/';
@@ -40,10 +44,38 @@ function startup(logger) {
     requestWithDefaults = request.defaults(defaults);
 }
 
-function doLookup(entities, options, cb) {
-    let blacklist = options.blacklist;
+function _setupRegexBlacklists(options){
+    if (options.domainBlacklistRegex !== previousDomainRegexAsString && options.domainBlacklistRegex.length === 0) {
+        log.debug("Removing Domain Blacklist Regex Filtering");
+        previousDomainRegexAsString = '';
+        domainBlacklistRegex = null;
+    } else {
+        if (options.domainBlacklistRegex !== previousDomainRegexAsString) {
+            previousDomainRegexAsString = options.domainBlacklistRegex;
+            log.debug({domainBlacklistRegex: previousDomainRegexAsString}, "Modifying Domain Blacklist Regex");
+            domainBlacklistRegex = new RegExp(options.domainBlacklistRegex, 'i');
+        }
+    }
 
-    log.trace({blacklist: blacklist}, "checking to see what blacklist looks like");
+    if (options.ipBlacklistRegex !== previousIpRegexAsString && options.ipBlacklistRegex.length === 0) {
+        log.debug("Removing IP Blacklist Regex Filtering");
+        previousIpRegexAsString = '';
+        ipBlacklistRegex = null;
+    } else {
+        if (options.ipBlacklistRegex !== previousIpRegexAsString) {
+            previousIpRegexAsString = options.ipBlacklistRegex;
+            log.debug({ipBlacklistRegex: previousIpRegexAsString}, "Modifying IP Blacklist Regex");
+            ipBlacklistRegex = new RegExp(options.ipBlacklistRegex, 'i');
+        }
+    }
+}
+
+function doLookup(entities, options, cb) {
+    //log.debug({options: options}, 'Options');
+
+    _setupRegexBlacklists(options);
+
+    let blacklist = options.blacklist;
 
     let lookupResults = [];
 
@@ -55,23 +87,35 @@ function doLookup(entities, options, cb) {
     async.each(entities, function (entityObj, next) {
         if (_.includes(blacklist, entityObj.value)) {
             next(null);
-        }else if (entityObj.isDomain && options.lookupDomain) {
+        } else if (entityObj.isDomain && options.lookupDomain) {
+            if (domainBlacklistRegex !== null) {
+                if (domainBlacklistRegex.test(entityObj.value)) {
+                    log.debug({domain: entityObj.value}, 'Blocked BlackListed Domain Lookup');
+                    return next(null);
+                }
+            }
+
             _lookupEntityDomain(entityObj, options, function (err, result) {
                 if (err) {
                     next(err);
                 } else {
                     lookupResults.push(result);
-                    log.debug({result: result}, "Checking the result values ");
                     next(null);
                 }
             });
         } else if (options.lookupIp && (entityObj.isIPv4 || entityObj.isIPv6) && !entityObj.isPrivateIP) {
+            if (ipBlacklistRegex !== null) {
+                if (ipBlacklistRegex.test(entityObj.value)) {
+                    log.debug({ip: entityObj.value}, 'Blocked BlackListed IP Lookup');
+                    return next(null);
+                }
+            }
+
             _lookupEntityIP(entityObj, options, function (err, result) {
                 if (err) {
                     next(err);
                 } else {
                     lookupResults.push(result);
-                    log.debug({result: result}, "Checking the result values ");
                     next(null);
                 }
             });
@@ -99,7 +143,7 @@ function _lookupEntityDomain(entityObj, options, cb) {
         json: true
     };
 
-    if(options.timeLastAfter === 0){
+    if (options.timeLastAfter === 0) {
         delete requestOptions.qs.time_last_after;
     }
 
@@ -118,19 +162,15 @@ function _lookupEntityDomain(entityObj, options, cb) {
             return;
         }
 
-        log.debug({body: body}, "Printing out the results of Body ");
-
         let bodyObjects = _processRequestBody(body);
 
         // this will only happen if all JSON rows couldn't be parsed so we'll treat it as an error
-        if(bodyObjects.length === 0){
+        if (bodyObjects.length === 0) {
             cb(_createJsonErrorPayload("Unable to parse result body into JSON", null, '500', '6', 'JSON Parse Failure', {
                 responseBody: body
             }));
             return;
         }
-
-        log.debug({bodyObj: bodyObjects}, "parsed data");
 
         _mutateBodyObjects(bodyObjects);
 
@@ -167,7 +207,7 @@ function _lookupEntityIP(entityObj, options, cb) {
         json: true
     };
 
-    if(options.timeLastAfter === 0){
+    if (options.timeLastAfter === 0) {
         delete requestOptions.qs.time_last_after;
     }
 
@@ -186,21 +226,15 @@ function _lookupEntityIP(entityObj, options, cb) {
             return;
         }
 
-        log.debug({body: body}, "Request Body for IP Lookup");
-
         let bodyObjects = _processRequestBody(body);
 
         // this will only happen if all JSON rows couldn't be parsed so we'll treat it as an error
-        if(bodyObjects.length === 0){
+        if (bodyObjects.length === 0) {
             cb(_createJsonErrorPayload("Unable to parse result body into JSON", null, '500', '6', 'JSON Parse Failure', {
                 responseBody: body
             }));
             return;
         }
-
-        log.debug({bodyObj: bodyObjects}, "parsed data");
-        log.debug({bodyObjTest: bodyObjects[1]}, "Body objects 1 test");
-        log.debug({bodyObject: bodyObjects}, "bodyobjects new");
 
         // Mutates the body objects to modify some properties and make them easier to render
         _mutateBodyObjects(bodyObjects);
@@ -231,25 +265,25 @@ function _lookupEntityIP(entityObj, options, cb) {
  * @returns {*} A javascript array containing DNSDB data objects
  * @private
  */
-function _processRequestBody(body){
-    if(typeof body === 'object' && !Array.isArray(body)){
+function _processRequestBody(body) {
+    if (typeof body === 'object' && !Array.isArray(body)) {
         // if only a single item is returned then it is automatically converted into
         // a javascript object literal by the request library so we can just return it inside
         // an array to keep everything consistent.
         return [body];
     }
 
-    if(typeof body !== 'string' || body.length === 0){
+    if (typeof body !== 'string' || body.length === 0) {
         return [];
     }
 
     let splitBody = body.split("\n");
 
     let bodyObjects = splitBody.reduce((result, rowAsString) => {
-        try{
+        try {
             let parsedRow = JSON.parse(rowAsString);
             result.push(parsedRow);
-        }catch(e){
+        } catch (e) {
             // invalid JSON so skip it
         }
         return result;
@@ -263,25 +297,25 @@ function _processRequestBody(body){
  * @param object
  * @private
  */
-function _mutateBodyObjects(bodyObjects){
+function _mutateBodyObjects(bodyObjects) {
     bodyObjects.forEach(function (obj) {
-        if(obj.time_first){
+        if (obj.time_first) {
             obj.time_first = obj.time_first * 1000;
         }
 
-        if(obj.time_last){
+        if (obj.time_last) {
             obj.time_last = obj.time_last * 1000;
         }
 
-        if(obj.zone_time_first){
+        if (obj.zone_time_first) {
             obj.zone_time_first = obj.zone_time_first * 1000;
         }
 
-        if(obj.zone_time_last){
+        if (obj.zone_time_last) {
             obj.zone_time_last = obj.zone_time_last * 1000;
         }
 
-        if(obj.rdata && !Array.isArray(obj.rdata)) {
+        if (obj.rdata && !Array.isArray(obj.rdata)) {
             obj.rdata = [obj.rdata];
         }
     });
