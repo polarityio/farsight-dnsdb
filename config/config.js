@@ -49,34 +49,34 @@ module.exports = {
             description: "DNSDB API key",
             type: "text",
             default: "",
-            userCanEdit: false,
+            userCanEdit: true,
             adminOnly: false
         },
         {
-            key: "blacklist",
-            name: "IP or Domain Blacklist",
+            key: "blocklist",
+            name: "Ignored IP or Domain list",
             description: "List of domains or IPs (space delimited) that you never want to send to DNSDB",
             default: "",
             type: "text",
-            userCanEdit: false,
+            userCanEdit: true,
             adminOnly: false
         },
         {
-            key: "domainBlacklistRegex",
-            name: "Domain Black List Regex",
-            description: "Domains that match the given regex will not be looked up (if blank, no domains will be black listed)",
+            key: "domainBlocklistRegex",
+            name: "Ignored Domain Regex",
+            description: "Domains that match the given regex will not be looked up.",
             default: "",
             type: "text",
-            userCanEdit: false,
+            userCanEdit: true,
             adminOnly: false
         },
         {
-            key: "ipBlacklistRegex",
-            name: "IP Black List Regex",
-            description: "IPs that match the given regex will not be looked up (if blank, no IPs will be black listed)",
+            key: "ipBlocklistRegex",
+            name: "Ignored IP Regex",
+            description: "IPs that match the given regex will not be looked up.",
             default: "",
             type: "text",
-            userCanEdit: false,
+            userCanEdit: true,
             adminOnly: false
         },
         {
