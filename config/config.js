@@ -58,7 +58,7 @@ module.exports = {
             description: "List of domains or IPs (space delimited) that you never want to send to DNSDB",
             default: "",
             type: "text",
-            userCanEdit: true,
+            userCanEdit: false,
             adminOnly: false
         },
         {
@@ -67,7 +67,7 @@ module.exports = {
             description: "Domains that match the given regex will not be looked up.",
             default: "",
             type: "text",
-            userCanEdit: true,
+            userCanEdit: false,
             adminOnly: false
         },
         {
@@ -76,7 +76,7 @@ module.exports = {
             description: "IPs that match the given regex will not be looked up.",
             default: "",
             type: "text",
-            userCanEdit: true,
+            userCanEdit: false,
             adminOnly: false
         },
         {
@@ -103,8 +103,8 @@ module.exports = {
             description: "Set the maximum number of unique summary tags to display in the notification overlay.",
             default: 3,
             type: "number",
-            userCanEdit: true,
-            adminOnly: false
+            userCanEdit: false,
+            adminOnly: true
         },
         {
             key: "lookupDomain",
