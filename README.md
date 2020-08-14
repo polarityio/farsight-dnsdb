@@ -14,9 +14,9 @@ In order to use the DNDSDB API, you must have a valid DNSDB API key. Which will 
 
 https://www.farsightsecurity.com/solutions/dnsdb/
 
-### Blacklist
+### Ignored List
 
-This is an alternate option that can be used to specify domains or IPs that you do not want sent to Farsight DNSDB.  The data must specify the entire IP or domain to be blocked (e.g., www.google.com is treated differently than google.com).
+This is an alternate option that can be used to specify domains or IPs that you do not want sent to Farsight DNSDB. The data must specify the entire IP or domain to be blocked (e.g., www.google.com is treated differently than google.com).
 
 ### Lookup Limit
 
