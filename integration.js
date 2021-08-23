@@ -12,7 +12,7 @@ let requestWithDefaults;
 let previousDomainRegexAsString = '';
 let previousIpRegexAsString = '';
 let domainBlocklistRegex = null;
-let ipBlaocklistRegex = null;
+let ipBlocklistRegex = null;
 
 const DOMAIN_URI = 'https://api.dnsdb.info/lookup/rrset/name/';
 const IP_URI = 'https://api.dnsdb.info/lookup/rdata/ip/';
