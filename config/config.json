@@ -1,6 +1,7 @@
 {
   "name": "Farsight DNSDB",
   "acronym": "PDNS",
+  "defaultColor": "light-grey",
   "logging": {
     "level": "info"
   },
