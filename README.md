@@ -2,11 +2,12 @@
 
 The Polarity Farsight DNSDH integration allows Polarity to search Farsight's API to return current and historical information about domains and IPs.  For more information about the Farsight DNSDB API please see https://api.dnsdb.info/
 
-![image](https://user-images.githubusercontent.com/22529325/30970702-ca3a0c88-a433-11e7-8aae-8e9958ca35c4.png)
 
+| ![image](./images/ip.png) | ![image](./images/domain.png) |
+|---|---|
+|*IP Lookup Example*|*Domain Lookup Example*|
 
 ## Farsight DNSDB Integration Options
-
 
 ### API Key
 
