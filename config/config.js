@@ -1,7 +1,7 @@
 module.exports = {
   name: 'Farsight DNSDB',
   acronym: 'PDNS',
-  defaultColor: 'light-grey',
+  defaultColor: 'light-gray',
   logging: {
     level: 'info'
   },
