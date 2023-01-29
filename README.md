@@ -2,11 +2,12 @@
 
 The Polarity Farsight DNSDH integration allows Polarity to search Farsight's API to return current and historical information about domains and IPs.  For more information about the Farsight DNSDB API please see https://api.dnsdb.info/
 
-![image](https://user-images.githubusercontent.com/22529325/30970702-ca3a0c88-a433-11e7-8aae-8e9958ca35c4.png)
 
+| ![image](./images/ip.png) | ![image](./images/domain.png) |
+|---|---|
+|*IP Lookup Example*|*Domain Lookup Example*|
 
 ## Farsight DNSDB Integration Options
-
 
 ### API Key
 
@@ -29,10 +30,6 @@ The maximum number of unique summary tags to display in the notification overlay
 ### Time Last After
 
 Filters out results where the last seen time is after the given time. The parameters expects an integer (Unix/Epoch time) with seconds granularity or a relative time in seconds (preceded by -). The default is to return results within the last year.
-
-### Lookup Options
-
-Each user has the ability to determine if they want to lookup IPs or Domains.
 
 ## Installation Instructions
 

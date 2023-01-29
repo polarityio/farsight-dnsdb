@@ -1,73 +1,67 @@
-<div class="dnsdball">
-    {{#each details.results as |item|}}
-        <div class = "rtype">
-            {{#if item.rrtype}}
-            <i class = "fa fa-list #ADADAD"></i><span class="type"> <b>Type: </b> </span>
-            {{item.rrtype}}
-            {{/if}}
-        </div>
+{{#if (gte details.results.length block.userOptions.limit)}}
+  <div class="p-footnote mb-1">Showing first {{details.results.length}} results</div>
+{{else}}
+  <div class="p-footnote mb-1">Showing {{details.results.length}} results</div>
+{{/if}}
 
-        <div class = "count">
-            {{#if item.count}}
-                <span class="counts"> Count: </span>
-                <b>{{item.count}}</b>
-            {{/if}}
+<div class="scrollable-container">
+  {{#each details.results as |item|}}
+    <div class="mb-2">
+      {{#if block.entity.isIP}}
+        <div class="p-title">{{fa-icon icon="globe" fixedWidth=true}} {{item.rrname}}</div>
+      {{/if}}
+      {{#if item.rrtype}}
+        <div>
+          <span class="p-key">Type:</span>
+          <span class="p-value">{{item.rrtype}}</span>
         </div>
-
-        <div class = "bali">
-            {{#if item.bailiwick}}
-                <span class="balis"> Bailiwick: </span>
-                <b>{{item.bailiwick}}</b>
-            {{/if}}
+      {{/if}}
+      {{#if item.count}}
+        <div>
+          <span class="p-key">Count:</span>
+          <span class="p-value">{{item.count}}</span>
         </div>
-
-        <div class = "first">
-            {{#if item.time_first}}
-                <span class="Ctimefirst"> First Seen: </span>
-                <b>{{moment-time item.time_first}}</b>
-            {{/if}}
+      {{/if}}
+      {{#if item.bailiwick}}
+        <div>
+          <span class="p-key">Bailiwick:</span>
+          <span class="p-value">{{item.bailiwick}}</span>
         </div>
-
-        <div class = "last">
-            {{#if item.time_last}}
-                <span class="Ctimelast"> Last Seen: </span>
-                <b>{{moment-time item.time_last}}</b>
-            {{/if}}
+      {{/if}}
+      {{#if item.time_first}}
+        <div>
+          <span class="p-key">First Seen:</span>
+          <span class="p-value">{{moment-time item.time_first}}</span>
         </div>
-
-        <div class = "first">
-            {{#if item.zone_time_first}}
-                <span class="Ctimefirst"> Zone First Seen: </span>
-                <b>{{moment-time item.zone_time_first}}</b>
-            {{/if}}
+      {{/if}}
+      {{#if item.time_last}}
+        <div>
+          <span class="p-key">Last Seen:</span>
+          <span class="p-value">{{moment-time item.time_last}}</span>
         </div>
-
-        <div class = "last">
-            {{#if item.zone_time_last}}
-                <span class="Ctimelast"> Zone Last Seen: </span>
-                <b>{{moment-time item.zone_time_last}}</b>
-            {{/if}}
+      {{/if}}
+      {{#if item.zone_time_first}}
+        <div>
+          <span class="p-key">Zone First Seen:</span>
+          <span class="p-value">{{moment-time item.zone_time_first}}</span>
         </div>
-
-        <div class = "rname">
-            {{#if item.rrname}}
-                <span class="name"> Name: </span>
-                <b>{{item.rrname}}</b>
-            {{/if}}
+      {{/if}}
+      {{#if item.zone_time_last}}
+        <div>
+          <span class="p-key">Zone Last Seen:</span>
+          <span class="p-value">{{moment-time item.zone_time_last}}</span>
         </div>
-
-        <div class = "rrdata">
-            {{#if item.rdata}}
-            <span class="datas"> Data: </span>
-            {{/if}}
-                {{#if item.rdata}}
-                    <ul>
-                    {{#each item.rdata as |data|}}
-                            <li>{{data}}</li>
-                    {{/each}}
-                    </ul>
-                {{else}}
-                {{/if}}
-        </div>
-    {{/each}}
+      {{/if}}
+      {{!-- data are IP addresses associated with the domain --}}
+      {{#if block.entity.isDomain}}
+        {{#if item.rdata.length}}
+          <div class="mt-1">
+          {{#each item.rdata as | data |}}
+            <span class="data-item">{{data}}</span>
+          {{/each}}
+          </div>
+        {{/if}}
+      {{/if}}
+    </div>
+  {{/each}}
 </div>
