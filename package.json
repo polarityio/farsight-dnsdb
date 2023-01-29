@@ -1,8 +1,7 @@
 {
   "name": "FarsightDNSDB",
-  "version": "3.0.0",
   "main": "./integration.js",
-  "description": "Farsight DNSDB Passive DNS Data Integration",
+  "version": "3.0.0",  
   "private": true,
   "dependencies": {
     "async": "^3.2.4",
