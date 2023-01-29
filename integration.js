@@ -1,23 +1,22 @@
 'use strict';
 
-let request = require('postman-request');
-let _ = require('lodash');
-let util = require('util');
-let net = require('net');
-let config = require('./config/config');
-let async = require('async');
-let fs = require('fs');
+const request = require('postman-request');
+const _ = require('lodash');
+const config = require('./config/config');
+const async = require('async');
+const fs = require('fs');
+
 let log = null;
 let requestWithDefaults;
 let previousDomainRegexAsString = '';
 let previousIpRegexAsString = '';
 let domainBlocklistRegex = null;
-let ipBlaocklistRegex = null;
+let ipBlocklistRegex = null;
 
 const DOMAIN_URI = 'https://api.dnsdb.info/lookup/rrset/name/';
 const IP_URI = 'https://api.dnsdb.info/lookup/rdata/ip/';
 
-function startup (logger) {
+function startup(logger) {
   log = logger;
   let defaults = {};
 
@@ -44,7 +43,7 @@ function startup (logger) {
   requestWithDefaults = request.defaults(defaults);
 }
 
-function _setupRegexBlocklists (options) {
+function _setupRegexBlocklists(options) {
   if (
     options.domainBlocklistRegex !== previousDomainRegexAsString &&
     options.domainBlocklistRegex.length === 0
@@ -79,9 +78,8 @@ function _setupRegexBlocklists (options) {
   }
 }
 
-function doLookup (entities, options, cb) {
+function doLookup(entities, options, cb) {
   //log.debug({options: options}, 'Options');
-
   _setupRegexBlocklists(options);
 
   let blocklist = options.blocklist;
@@ -145,7 +143,7 @@ function doLookup (entities, options, cb) {
   );
 }
 
-function _lookupEntityDomain (entityObj, options, cb) {
+function _lookupEntityDomain(entityObj, options, cb) {
   let requestOptions = {
     uri: DOMAIN_URI + entityObj.value.toLowerCase(),
     method: 'GET',
@@ -218,7 +216,7 @@ function _lookupEntityDomain (entityObj, options, cb) {
   });
 }
 
-function _lookupEntityIP (entityObj, options, cb) {
+function _lookupEntityIP(entityObj, options, cb) {
   let requestOptions = {
     uri: IP_URI + entityObj.value,
     method: 'GET',
@@ -299,7 +297,7 @@ function _lookupEntityIP (entityObj, options, cb) {
  * @returns {*} A javascript array containing DNSDB data objects
  * @private
  */
-function _processRequestBody (body) {
+function _processRequestBody(body) {
   if (typeof body === 'object' && !Array.isArray(body)) {
     // if only a single item is returned then it is automatically converted into
     // a javascript object literal by the request library so we can just return it inside
@@ -331,7 +329,7 @@ function _processRequestBody (body) {
  * @param object
  * @private
  */
-function _mutateBodyObjects (bodyObjects) {
+function _mutateBodyObjects(bodyObjects) {
   bodyObjects.forEach(function (obj) {
     if (obj.time_first) {
       obj.time_first = obj.time_first * 1000;
@@ -355,11 +353,11 @@ function _mutateBodyObjects (bodyObjects) {
   });
 }
 
-function _isLookupMiss (response) {
+function _isLookupMiss(response) {
   return response.statusCode === 404;
 }
 
-function _isApiError (err, response, body, entityValue) {
+function _isApiError(err, response, body, entityValue) {
   if (err) {
     return err;
   }
@@ -431,7 +429,7 @@ function _isApiError (err, response, body, entityValue) {
   return null;
 }
 
-function validateOptions (userOptions, cb) {
+function validateOptions(userOptions, cb) {
   let errors = [];
   if (
     typeof userOptions.apiKey.value !== 'string' ||
@@ -447,14 +445,14 @@ function validateOptions (userOptions, cb) {
 }
 
 // function that takes the ErrorObject and passes the error message to the notification window
-var _createJsonErrorPayload = function (msg, pointer, httpCode, code, title, meta) {
+function _createJsonErrorPayload(msg, pointer, httpCode, code, title, meta) {
   return {
     errors: [_createJsonErrorObject(msg, pointer, httpCode, code, title, meta)]
   };
-};
+}
 
 // function that creates the Json object to be passed to the payload
-var _createJsonErrorObject = function (msg, pointer, httpCode, code, title, meta) {
+function _createJsonErrorObject(msg, pointer, httpCode, code, title, meta) {
   let error = {
     detail: msg,
     status: httpCode.toString(),
@@ -473,7 +471,7 @@ var _createJsonErrorObject = function (msg, pointer, httpCode, code, title, meta
   }
 
   return error;
-};
+}
 
 module.exports = {
   doLookup: doLookup,
