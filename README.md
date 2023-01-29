@@ -31,10 +31,6 @@ The maximum number of unique summary tags to display in the notification overlay
 
 Filters out results where the last seen time is after the given time. The parameters expects an integer (Unix/Epoch time) with seconds granularity or a relative time in seconds (preceded by -). The default is to return results within the last year.
 
-### Lookup Options
-
-Each user has the ability to determine if they want to lookup IPs or Domains.
-
 ## Installation Instructions
 
 Installation instructions for integrations are provided on the [PolarityIO GitHub Page](https://polarityio.github.io/).
