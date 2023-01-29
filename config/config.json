@@ -1,6 +1,6 @@
 {
   "name": "Farsight DNSDB",
-  "acronym": "PDNS",
+  "acronym": "DNSDB",
   "defaultColor": "light-gray",
   "logging": {
     "level": "info"
@@ -22,14 +22,6 @@
       "file": "./templates/dnsdb-block.hbs"
     }
   },
-  "summary": {
-    "component": {
-      "file": "./components/dnsdb-summary.js"
-    },
-    "template": {
-      "file": "./templates/dnsdb-summary.hbs"
-    }
-  },
   "request": {
     "cert": "",
     "key": "",
@@ -43,10 +35,10 @@
       "key": "apiKey",
       "name": "API Key",
       "description": "DNSDB API key",
-      "type": "text",
+      "type": "password",
       "default": "",
-      "userCanEdit": true,
-      "adminOnly": false
+      "userCanEdit": false,
+      "adminOnly": true
     },
     {
       "key": "blocklist",
@@ -88,7 +80,7 @@
       "key": "limit",
       "name": "Lookup Limit",
       "description": "The maximum number of results to return per IP or Domain lookup.",
-      "default": 10,
+      "default": 25,
       "type": "number",
       "userCanEdit": false,
       "adminOnly": true
@@ -101,24 +93,6 @@
       "type": "number",
       "userCanEdit": false,
       "adminOnly": true
-    },
-    {
-      "key": "lookupDomain",
-      "name": "Lookup Domains",
-      "description": "If checked, the integration will lookup Domains",
-      "default": true,
-      "type": "boolean",
-      "userCanEdit": true,
-      "adminOnly": false
-    },
-    {
-      "key": "lookupIp",
-      "name": "Lookup IPv4 and IPv6 Addresses",
-      "description": "If checked, the integration will lookup IPv4 and IPv6 addresses",
-      "default": true,
-      "type": "boolean",
-      "userCanEdit": true,
-      "adminOnly": false
     }
   ]
 }

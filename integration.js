@@ -96,7 +96,7 @@ function doLookup(entities, options, cb) {
     function (entityObj, next) {
       if (_.includes(blocklist, entityObj.value)) {
         next(null);
-      } else if (entityObj.isDomain && options.lookupDomain) {
+      } else if (entityObj.isDomain) {
         if (domainBlocklistRegex !== null) {
           if (domainBlocklistRegex.test(entityObj.value)) {
             log.debug({ domain: entityObj.value }, 'Blocked BlockListed Domain Lookup');
@@ -112,11 +112,7 @@ function doLookup(entities, options, cb) {
             next(null);
           }
         });
-      } else if (
-        options.lookupIp &&
-        (entityObj.isIPv4 || entityObj.isIPv6) &&
-        !entityObj.isPrivateIP
-      ) {
+      } else if ((entityObj.isIPv4 || entityObj.isIPv6) && !entityObj.isPrivateIP) {
         if (ipBlocklistRegex !== null) {
           if (ipBlocklistRegex.test(entityObj.value)) {
             log.debug({ ip: entityObj.value }, 'Blocked BlockListed IP Lookup');
@@ -169,6 +165,8 @@ function _lookupEntityDomain(entityObj, options, cb) {
       return;
     }
 
+    log.trace({ body }, 'Domain Lookup Result');
+
     if (_isLookupMiss(response)) {
       cb(null, {
         entity: entityObj,
@@ -205,15 +203,37 @@ function _lookupEntityDomain(entityObj, options, cb) {
       // Required: An object containing everything you want passed to the template
       data: {
         // We are constructing the tags using a custom summary block so no data needs to be passed here
-        summary: [],
+        summary: getSummaryTags(entityObj, bodyObjects, options),
         // Data that you want to pass back to the notification window details block
         details: {
-          maxTags: options.maxTags,
           results: bodyObjects
         }
       }
     });
   });
+}
+
+function getSummaryTags(entity, body, options) {
+  const tags = [];
+  if (entity.isDomain) {
+    const ips = new Set();
+    for(let i=0; i<body.length; i++){
+      for(let j=0; j<body[i].rdata.length; j++){
+        if(ips.size >= options.maxTags){
+          break;
+        }
+        ips.add(body[i].rdata[j]);
+      }
+    }
+    return Array.from(ips);
+  } else {
+    // is IP
+    const tagResults = body.slice(0, options.maxTags);
+    tagResults.forEach((result) => {
+      tags.push(result.rrname);
+    });
+  }
+  return tags;
 }
 
 function _lookupEntityIP(entityObj, options, cb) {
@@ -241,6 +261,8 @@ function _lookupEntityIP(entityObj, options, cb) {
       cb(errorObject);
       return;
     }
+
+    log.trace({ body }, 'Lookup result');
 
     if (_isLookupMiss(response)) {
       cb(null, {
@@ -279,10 +301,9 @@ function _lookupEntityIP(entityObj, options, cb) {
       // Required: An object containing everything you want passed to the template
       data: {
         // We are constructing the tags using a custom summary block so no data needs to be passed here
-        summary: [],
+        summary: getSummaryTags(entityObj, bodyObjects, options),
         // Data that you want to pass back to the notification window details block
         details: {
-          maxTags: options.maxTags,
           results: bodyObjects
         }
       }

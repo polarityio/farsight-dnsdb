@@ -1,6 +1,6 @@
 module.exports = {
   name: 'Farsight DNSDB',
-  acronym: 'PDNS',
+  acronym: 'DNSDB',
   defaultColor: 'light-gray',
   logging: {
     level: 'info'
@@ -16,26 +16,18 @@ module.exports = {
       file: './templates/dnsdb-block.hbs'
     }
   },
-  summary: {
-    component: {
-      file: './components/dnsdb-summary.js'
-    },
-    template: {
-      file: './templates/dnsdb-summary.hbs'
-    }
-  },
   request: {
     // Provide the path to your certFile. Leave an empty string to ignore this option.
-    // Relative paths are relative to the Gigamon ThreatINSIGHT integration's root directory
+    // Relative paths are relative to the integration's root directory
     cert: '',
     // Provide the path to your private key. Leave an empty string to ignore this option.
-    // Relative paths are relative to the Gigamon ThreatINSIGHT integration's root directory
+    // Relative paths are relative to the  integration's root directory
     key: '',
     // Provide the key passphrase if required.  Leave an empty string to ignore this option.
-    // Relative paths are relative to the Gigamon ThreatINSIGHT integration's root directory
+    // Relative paths are relative to the integration's root directory
     passphrase: '',
     // Provide the Certificate Authority. Leave an empty string to ignore this option.
-    // Relative paths are relative to the Gigamon ThreatINSIGHT integration's root directory
+    // Relative paths are relative to the integration's root directory
     ca: '',
     // An HTTP proxy to be used. Supports proxy Auth with Basic Auth, identical to support for
     // the url parameter (by embedding the auth info in the uri)
@@ -48,10 +40,10 @@ module.exports = {
       key: 'apiKey',
       name: 'API Key',
       description: 'DNSDB API key',
-      type: 'text',
+      type: 'password',
       default: '',
-      userCanEdit: true,
-      adminOnly: false
+      userCanEdit: false,
+      adminOnly: true
     },
     {
       key: 'blocklist',
@@ -94,10 +86,10 @@ module.exports = {
       key: 'limit',
       name: 'Lookup Limit',
       description: 'The maximum number of results to return per IP or Domain lookup.',
-      default: 10,
+      default: 25,
       type: 'number',
       userCanEdit: false,
-      adminOnly: true
+      adminOnly: false
     },
     {
       key: 'maxTags',
@@ -107,24 +99,6 @@ module.exports = {
       default: 3,
       type: 'number',
       userCanEdit: false,
-      adminOnly: true
-    },
-    {
-      key: 'lookupDomain',
-      name: 'Lookup Domains',
-      description: 'If checked, the integration will lookup Domains',
-      default: true,
-      type: 'boolean',
-      userCanEdit: true,
-      adminOnly: false
-    },
-    {
-      key: 'lookupIp',
-      name: 'Lookup IPv4 and IPv6 Addresses',
-      description: 'If checked, the integration will lookup IPv4 and IPv6 addresses',
-      default: true,
-      type: 'boolean',
-      userCanEdit: true,
       adminOnly: false
     }
   ]
