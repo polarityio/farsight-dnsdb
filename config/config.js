@@ -31,9 +31,7 @@ module.exports = {
     ca: '',
     // An HTTP proxy to be used. Supports proxy Auth with Basic Auth, identical to support for
     // the url parameter (by embedding the auth info in the uri)
-    proxy: '',
-
-    rejectUnauthorized: true
+    proxy: ""
   },
   options: [
     {
