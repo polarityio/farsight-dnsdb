@@ -1,0 +1,65 @@
+{
+  "results": [
+    {
+      "rrname": "malicious-domain.com.",
+      "rrtype": "A",
+      "bailiwick": "com.",
+      "rdata": [
+        "192.0.2.45",
+        "192.0.2.46",
+        "192.0.2.47"
+      ],
+      "count": 127,
+      "time_first": 1638316800000,
+      "time_last": 1704067200000,
+      "zone_time_first": 1638316800000,
+      "zone_time_last": 1704067200000
+    },
+    {
+      "rrname": "malicious-domain.com.",
+      "rrtype": "AAAA",
+      "bailiwick": "com.",
+      "rdata": [
+        "2001:db8::1"
+      ],
+      "count": 42,
+      "time_first": 1640995200000,
+      "time_last": 1704067200000,
+      "zone_time_first": 1640995200000,
+      "zone_time_last": 1704067200000
+    },
+    {
+      "rrname": "suspicious-subdomain.malicious-domain.com.",
+      "rrtype": "CNAME",
+      "bailiwick": "malicious-domain.com.",
+      "rdata": [
+        "redirect.badactor.net."
+      ],
+      "count": 15,
+      "time_first": 1698796800000,
+      "time_last": 1704067200000,
+      "zone_time_first": 1698796800000,
+      "zone_time_last": 1704067200000
+    },
+    {
+      "rrname": "phishing.malicious-domain.com.",
+      "rrtype": "A",
+      "bailiwick": "malicious-domain.com.",
+      "rdata": [
+        "203.0.113.10"
+      ],
+      "count": 8,
+      "time_first": 1701388800000,
+      "time_last": 1704067200000
+    }
+  ],
+  "extra_debug_field": "This should be filtered out by the reducer",
+  "metadata": {
+    "query_time": "2024-01-01T12:00:00Z",
+    "api_version": "v2"
+  },
+  "internal_processing": {
+    "cached": false,
+    "request_id": "abc123def456"
+  }
+}
